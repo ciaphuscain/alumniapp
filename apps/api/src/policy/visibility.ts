@@ -15,11 +15,14 @@ export const MEMBER_FROM = `profiles p
 /** Target account is active and its university affiliation is currently verified. */
 export const ACTIVE_VERIFIED = `(u.status = 'active' AND vc.state = 'verified')`;
 
-/** Neither side has blocked the other. */
-export const notBlocked = (viewer: string) => `NOT EXISTS (
-  SELECT 1 FROM blocks b
-   WHERE (b.blocker_id = ${viewer} AND b.blocked_id = p.user_id)
-      OR (b.blocker_id = p.user_id AND b.blocked_id = ${viewer}))`;
+/**
+ * Neither side has blocked the other. Written as two NOT EXISTS clauses rather than one
+ * with an OR so the planner can use hashed anti-joins / the primary key for each direction
+ * (see docs/benchmarks/directory-search.md for the measured difference).
+ */
+export const notBlocked = (viewer: string) => `(
+  NOT EXISTS (SELECT 1 FROM blocks b WHERE b.blocker_id = ${viewer} AND b.blocked_id = p.user_id)
+  AND NOT EXISTS (SELECT 1 FROM blocks b WHERE b.blocker_id = p.user_id AND b.blocked_id = ${viewer}))`;
 
 export const isConnected = (viewer: string) => `EXISTS (
   SELECT 1 FROM connections c

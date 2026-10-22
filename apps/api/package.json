@@ -9,7 +9,7 @@
     "migrate": "tsx --env-file-if-exists=.env scripts/migrate.ts",
     "grant-admin": "tsx --env-file-if-exists=.env scripts/grant-admin.ts",
     "seed": "tsx --env-file-if-exists=.env scripts/seed.ts",
-    "bench": "tsx --env-file-if-exists=.env bench/directory-search.ts",
+    "bench": "tsx bench/directory-search.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
